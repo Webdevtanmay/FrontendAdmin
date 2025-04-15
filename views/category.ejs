@@ -1,0 +1,44 @@
+<%- include("./header.ejs") %>
+    <form action="/categories" method="post">
+        <div class="container text-dark">
+            <div class="row my-5">
+                <div class="col-md-12 text-center">
+                    <h1>Add Category</h1>
+                </div>
+                <div class="col-md-6">
+                    <label for="pname">Category Name</label>
+                    <input id="pname" name="cname" type="text" class="form-control bg-white" />
+                </div>
+                <div class="col-6 d-flex flex-column align-items-center">
+                    <button type="submit" class="btn btn-lg btn-success w-75 mt-4">SUbmit</button>
+                </div>
+            </div>
+            <div class="row my-5">
+                <div class="col-md-12 text-center my-3">
+                    <h1>Manage Categories</h1>
+                </div>
+                <div class="col-md-12">
+                    <table class="table table-stripped ">
+                        <tr>
+                            <th>SN</th>
+                            <th>Category Name</th>
+                            <th>Action</th>
+                        </tr>
+                        <% for(let i=0;i<categories.length;i++){%>
+                            <tr>
+                                <td>
+                                    <%=i+1%>
+                                </td>
+                                <td>
+                                    <%=categories[i].catname%>
+                                </td>
+                                <td><button type="button" class="btn btn-danger">Delete</button></td>
+                            </tr>
+                            <%}%>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <%- include("./footer.ejs") %>

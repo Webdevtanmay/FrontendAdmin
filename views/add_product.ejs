@@ -1,48 +1,71 @@
-    <%- include("./header.ejs") %>
+<%- include("./header.ejs") %>
     <form action="/save_product" method="post" enctype="multipart/form-data">
-    <div class="container text-dark">
-        <div class="row">
-        <div class="col-md-12 text-center">
-            <h1>Add Product</h1>
+        <div class="container text-dark">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <h1>Add Product</h1>
+                </div>
+                <div class="col-md-6">
+                    <label for="pname">Product Name</label>
+                    <input id="pname" name="pname" type="text" class="form-control bg-white" />
+                </div>
+                <div class="col-md-6">
+                    <label for="pprice">Product Price</label>
+                    <input id="pprice" name="pprice" type="number" class="form-control bg-white" />
+                </div>
+                <div class="col-md-6">
+                    <label for="pimage">Product Image</label>
+                    <input name="pimage" type="file" class="form-control bg-white" />
+                </div>
+                <div class="col-md-6">
+                    <label for="pcat">Product Category</label>
+                    <select name="pcat" class="form-control bg-white" id="pcat">
+                        <option selected disabled>----select category----</option>
+                        <% for(let i=0;i<categories.length;i++){%>
+                            <option value="<%=categories[i].catid%>">
+                                <%=categories[i].catname%>
+                            </option>
+                            <% }%>
+                    </select>
+                </div>
+                <div class="col-12 text-center my-2">
+                    <button type="submit" class="btn btn-success">SUbmit</button>
+                </div>
+            </div>
+            <div class="row my-5">
+                <div class="col-md-12 text-center my-3">
+                    <h1>Manage Products</h1>
+                </div>
+                <div class="col-md-12">
+                    <table class="table table-stripped ">
+                        <tr>
+                            <th>SN</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Image</th>
+                            <th>Action</th>
+                        </tr>
+                        <% for(let i=0;i<products.length;i++){%>
+                            <tr>
+                                <td>
+                                    <%=i+1%>
+                                </td>
+                                <td>
+                                    <%=products[i].pname%>
+                                </td>
+                                <td>
+                                    <%=products[i].pprice%>
+                                </td>
+                                <td>
+                                    <%=products[i].pimage%>
+                                </td>
+                                <td><button type="button" class="btn btn-danger">Delete</button></td>
+                            </tr>
+                            <%}%>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div class="col-md-6">
-            <label for="pname">Product Name</label>
-            <input
-            id="pname"
-            name="pname"
-            type="text"
-            class="form-control bg-white"
-            />
-        </div>
-        <div class="col-md-6">
-            <label for="pprice">Product Price</label>
-            <input
-            id="pprice"
-            name="pprice"
-            type="number"
-            class="form-control bg-white"
-            />
-        </div>
-        <div class="col-md-6">
-            <label for="pimage">Product Image</label>
-            <input
-            name="pimage"
-            type="file"
-            class="form-control bg-white"
-            />
-        </div>
-        <div class="col-md-6">
-            <label for="pcat">Product Category</label>
-            <select name="pcat" class="form-control bg-white" id="pcat">
-            <option selected disabled>----select category----</option>
-            <option value="Cat1">Cat1</option>
-            </select>
-        </div>
-        <div class="col-12 text-center my-2">
-            <button type="submit" class="btn btn-success">SUbmit</button>
-        </div>
-        </div>
-    </div>
     </form>
 
     <%- include("./footer.ejs") %>
