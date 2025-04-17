@@ -21,6 +21,24 @@
     <link rel="stylesheet" href="/assets/css/style.css">
     <!-- End layout styles -->
     <link rel="shortcut icon" href="/assets/images/favicon.png" />
+    <style>
+      .form-control {
+        background-color: white !important;
+        color: black !important;
+        border: 1px solid #ced4da;
+      }
+      
+      .form-control:focus {
+        background-color: white !important;
+        color: black !important;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      }
+      
+      .form-control:read-only {
+        background-color: #e9ecef !important;
+      }
+    </style>
   </head>
   <body>
     <div class="container-scroller">
@@ -45,36 +63,25 @@
               </div>
               <a href="#" id="profile-dropdown" data-toggle="dropdown"><i class="mdi mdi-dots-vertical"></i></a>
               <div class="dropdown-menu dropdown-menu-right sidebar-dropdown preview-list" aria-labelledby="profile-dropdown">
-                <a href="#" class="dropdown-item preview-item">
+                <a href="#" class="dropdown-item preview-item" data-toggle="modal" data-target="#profileModal">
                   <div class="preview-thumbnail">
                     <div class="preview-icon bg-dark rounded-circle">
-                      <i class="mdi mdi-settings text-primary"></i>
+                      <i class="mdi mdi-account text-primary"></i>
                     </div>
                   </div>
                   <div class="preview-item-content">
-                    <p class="preview-subject ellipsis mb-1 text-small">Account settings</p>
+                    <p class="preview-subject ellipsis mb-1 text-small">View Profile</p>
                   </div>
                 </a>
                 <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item preview-item">
+                <a href="/logout" class="dropdown-item preview-item">
                   <div class="preview-thumbnail">
                     <div class="preview-icon bg-dark rounded-circle">
-                      <i class="mdi mdi-onepassword  text-info"></i>
+                      <i class="mdi mdi-logout text-danger"></i>
                     </div>
                   </div>
                   <div class="preview-item-content">
-                    <p class="preview-subject ellipsis mb-1 text-small">Change Password</p>
-                  </div>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item preview-item">
-                  <div class="preview-thumbnail">
-                    <div class="preview-icon bg-dark rounded-circle">
-                      <i class="mdi mdi-calendar-today text-success"></i>
-                    </div>
-                  </div>
-                  <div class="preview-item-content">
-                    <p class="preview-subject ellipsis mb-1 text-small">To-do list</p>
+                    <p class="preview-subject ellipsis mb-1 text-small">Logout</p>
                   </div>
                 </a>
               </div>
@@ -151,10 +158,18 @@
                   </div>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="profileDropdown">
-                  <!-- <h6 class="p-3 mb-0">Profile</h6> -->
-                  <!-- <div class="dropdown-divider"></div> -->
-                  
-                  <a class="dropdown-item preview-item">
+                  <a class="dropdown-item preview-item" data-toggle="modal" data-target="#profileModal">
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-dark rounded-circle">
+                        <i class="mdi mdi-account text-primary"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content">
+                      <p class="preview-subject mb-1">View Profile</p>
+                    </div>
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item preview-item" href="/logout">
                     <div class="preview-thumbnail">
                       <div class="preview-icon bg-dark rounded-circle">
                         <i class="mdi mdi-logout text-danger"></i>
@@ -164,8 +179,6 @@
                       <p class="preview-subject mb-1">Log out</p>
                     </div>
                   </a>
-                  <!-- <div class="dropdown-divider"></div> -->
-                  <!-- <p class="p-3 mb-0 text-center">Advanced settings</p> -->
                 </div>
               </li>
             </ul>
@@ -177,3 +190,84 @@
         <!-- partial -->
         <div class="main-panel">
           <div class="content-wrapper bg-white">
+
+            <!-- Profile Modal -->
+            <div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="profileModalLabel">Profile Information</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="text-center mb-4">
+                      <img src="https://ui-avatars.com/api/?name=<%= admin.name %>&background=random&size=128" class="rounded-circle" alt="Profile Picture">
+                    </div>
+                    <form id="profileForm">
+                      <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" class="form-control" id="name" name="name" value="<%= admin.name %>">
+                      </div>
+                      <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="<%= admin.email %>">
+                      </div>
+                      <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" value="<%= admin.username %>" readonly>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveProfile">Save changes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <script>
+              // Profile form submission
+              document.getElementById('saveProfile').addEventListener('click', async () => {
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+
+                try {
+                  const response = await fetch('/update-profile', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email })
+                  });
+
+                  const result = await response.json();
+                  
+                  if (result.success) {
+                    // Update all instances of admin name in the header
+                    document.querySelectorAll('.admin-name').forEach(el => {
+                      el.textContent = result.admin.name;
+                    });
+                    document.querySelectorAll('.navbar-profile-name').forEach(el => {
+                      el.textContent = result.admin.name;
+                    });
+                    
+                    // Update all profile pictures
+                    document.querySelectorAll('.profile-pic img').forEach(img => {
+                      img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(result.admin.name)}&background=random&color=fff`;
+                    });
+                    
+                    // Show success message and close modal
+                    alert('Profile updated successfully');
+                    $('#profileModal').modal('hide');
+                  } else {
+                    alert(result.message || 'Error updating profile');
+                  }
+                } catch (error) {
+                  console.error('Error:', error);
+                  alert('Error updating profile');
+                }
+              });
+            </script>
