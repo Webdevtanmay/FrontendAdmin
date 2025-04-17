@@ -83,40 +83,35 @@ app.get("/login", (req, res) => {
 app.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
+    console.log('Login attempt for username:', username);
     
-    // Find user by username
-    const user = await User.findOne({ username });
+    // Find admin by username
+    const admin = await Admin.findOne({ username });
+    console.log('Found admin:', admin ? 'Yes' : 'No');
     
-    if (!user) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Invalid username or password" 
-      });
+    if (!admin) {
+      console.log('Admin not found');
+      return res.render('login.ejs', { error: 'Invalid username or password' });
     }
     
     // In production, you should hash the password and compare
-    if (user.password !== password) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Invalid username or password" 
-      });
+    if (admin.password !== password) {
+      console.log('Password mismatch');
+      return res.render('login.ejs', { error: 'Invalid username or password' });
     }
     
-    res.json({ 
-      success: true, 
-      message: "Login successful",
-      user: {
-        id: user._id,
-        username: user.username,
-        fullName: user.fullName
-      }
-    });
+    // Set session
+    req.session.admin = {
+      id: admin._id,
+      username: admin.username,
+      name: admin.name
+    };
+    
+    console.log('Login successful, redirecting to dashboard');
+    res.redirect('/dashboard');
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({ 
-      success: false, 
-      message: "Error during login" 
-    });
+    res.render('login.ejs', { error: 'An error occurred during login' });
   }
 });
 
