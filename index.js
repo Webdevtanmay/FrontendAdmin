@@ -1,11 +1,27 @@
-express = require('express')
-app = express()
-app.use(express.static("public/"))
-bodyparser = require('body-parser')
-app.use(bodyparser.json())
-app.use(bodyparser.urlencoded({ extended: true }))
-const fileUpload = require("express-fileupload");
-app.use(fileUpload()); // Initialize express-fileupload
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const session = require('express-session');
+const fileUpload = require('express-fileupload');
+const path = require('path');
+const ejs = require('ejs');
+
+// Set up EJS as the view engine
+app.engine('ejs', ejs.renderFile);
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+// Middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('public'));
+app.use(fileUpload());
+app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true
+}));
 
 // Add CORS support
 const cors = require('cors');
@@ -16,16 +32,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Add session middleware
-const session = require('express-session');
-app.use(session({
-  secret: 'tannubhau', // Change this to a secure secret in production
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false } // Set to true if using HTTPS
-}));
-
-const mongoose = require('mongoose');
 const fs = require('fs');
 
 mongoose.connect("mongodb://localhost:27017/tanmay", {
@@ -722,6 +728,80 @@ app.post('/submit-feedback', async (req, res) => {
         res.setHeader('Content-Type', 'application/json');
         res.status(500).json({ error: 'Failed to submit feedback' });
     }
+});
+
+// Orders route
+app.get('/orders', async (req, res) => {
+  try {
+    // Test data
+    const orders = [
+      {
+        _id: '123456',
+        createdAt: new Date().toLocaleDateString(),
+        items: [
+          {
+            name: 'Test Product 1',
+            price: 100,
+            quantity: 2
+          },
+          {
+            name: 'Test Product 2',
+            price: 200,
+            quantity: 1
+          }
+        ],
+        totalAmount: 400,
+        status: 'pending'
+      }
+    ];
+    
+    // Set content type to HTML
+    res.setHeader('Content-Type', 'text/html');
+    
+    res.render('orders', { 
+      orders: orders,
+      admin: req.session.admin
+    });
+  } catch (error) {
+    console.error('Error rendering orders:', error);
+    res.status(500).send('Error rendering orders');
+  }
+});
+
+app.get("/ord",(req,res)=>{
+  res.render("lala.ejs");
+})
+
+// Update order status
+app.post('/update-order-status/:orderId', requireAuth, async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { status } = req.body;
+    
+    const order = await Order.findByIdAndUpdate(
+      orderId,
+      { status },
+      { new: true }
+    );
+    
+    if (!order) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Order not found' 
+      });
+    }
+    
+    res.json({ 
+      success: true, 
+      message: 'Order status updated successfully' 
+    });
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error updating order status' 
+    });
+  }
 });
 
 app.listen(5000, () => console.log("Running on PORT : 5000"));
